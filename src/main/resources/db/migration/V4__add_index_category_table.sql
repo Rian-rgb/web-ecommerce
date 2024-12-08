@@ -1,0 +1,1 @@
+CREATE INDEX idx_category_name ON category(name);
