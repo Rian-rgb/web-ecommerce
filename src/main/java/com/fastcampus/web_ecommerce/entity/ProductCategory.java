@@ -1,5 +1,6 @@
 package com.fastcampus.web_ecommerce.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
@@ -23,12 +24,14 @@ public class ProductCategory {
     private ProductCategoryId id;
 
     @CreationTimestamp
-    private LocalDateTime created_at;
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
 
     @UpdateTimestamp
-    private LocalDateTime updated_at;
+    private LocalDateTime updatedAt;
 
     @Embeddable
+    @Data
     public static class ProductCategoryId {
         private Long productId;
         private Long categoryId;

@@ -1,4 +1,4 @@
-package com.fastcampus.web_ecommerce.response;
+package com.fastcampus.web_ecommerce.response.product;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,5 +16,7 @@ public class CreateProductResponse {
     private String name;
     private BigDecimal price;
     private String description;
+    private Integer stockQuantity;
+    private BigDecimal weight;
 
 }

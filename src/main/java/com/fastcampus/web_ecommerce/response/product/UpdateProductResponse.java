@@ -1,4 +1,4 @@
-package com.fastcampus.web_ecommerce.response;
+package com.fastcampus.web_ecommerce.response.product;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class GetProductResponse {
+public class UpdateProductResponse {
 
     private String name;
     private BigDecimal price;
