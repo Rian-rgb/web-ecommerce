@@ -1,6 +1,9 @@
 package com.fastcampus.web_ecommerce.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,7 +11,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,17 +19,10 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product {
+public class UserRole {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productId;
-
-    private String name;
-    private String description;
-    private BigDecimal price;
-    private Integer stockQuantity;
-    private BigDecimal weight;
+    @EmbeddedId
+    private UserRoleId id;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -34,7 +30,14 @@ public class Product {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-    private Long userId;
 
-
+    @Embeddable
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserRoleId {
+        private Long userId;
+        private Long roleId;
+    }
 }

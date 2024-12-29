@@ -1,4 +1,4 @@
-package com.fastcampus.web_ecommerce.request;
+package com.fastcampus.web_ecommerce.request.product;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

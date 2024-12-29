@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -16,17 +15,17 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product {
+@Table(name = "roles")
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long productId;
+    private Long roleId;
 
+    @Column(unique = true, nullable = false)
     private String name;
+
     private String description;
-    private BigDecimal price;
-    private Integer stockQuantity;
-    private BigDecimal weight;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -34,7 +33,5 @@ public class Product {
 
     @UpdateTimestamp
     private LocalDateTime updatedAt;
-    private Long userId;
-
 
 }

@@ -1,8 +1,8 @@
 package com.fastcampus.web_ecommerce.mapper;
 
 import com.fastcampus.web_ecommerce.entity.Product;
-import com.fastcampus.web_ecommerce.request.CreateProductRequest;
-import com.fastcampus.web_ecommerce.request.UpdateProductRequest;
+import com.fastcampus.web_ecommerce.request.product.CreateProductRequest;
+import com.fastcampus.web_ecommerce.request.product.UpdateProductRequest;
 import com.fastcampus.web_ecommerce.response.product.CreateProductResponse;
 import com.fastcampus.web_ecommerce.response.product.UpdateProductResponse;
 import org.mapstruct.Mapper;

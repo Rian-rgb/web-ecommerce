@@ -3,26 +3,34 @@ package com.fastcampus.web_ecommerce.service.impl;
 import com.fastcampus.web_ecommerce.entity.Category;
 import com.fastcampus.web_ecommerce.entity.Product;
 import com.fastcampus.web_ecommerce.entity.ProductCategory;
+import com.fastcampus.web_ecommerce.entity.UserInfo;
+import com.fastcampus.web_ecommerce.exception.custom.ForbiddenException;
 import com.fastcampus.web_ecommerce.exception.custom.NotFoundException;
 import com.fastcampus.web_ecommerce.mapper.ProductMapper;
 import com.fastcampus.web_ecommerce.repository.CategoryRepository;
 import com.fastcampus.web_ecommerce.repository.ProductCategoryRepository;
 import com.fastcampus.web_ecommerce.repository.ProductRepository;
-import com.fastcampus.web_ecommerce.request.CreateProductRequest;
-import com.fastcampus.web_ecommerce.request.UpdateProductRequest;
+import com.fastcampus.web_ecommerce.request.product.CreateProductRequest;
+import com.fastcampus.web_ecommerce.request.product.UpdateProductRequest;
 import com.fastcampus.web_ecommerce.response.product.PaginationGetProductResponse;
 import com.fastcampus.web_ecommerce.response.catogory.GetCategoryResponse;
 import com.fastcampus.web_ecommerce.response.product.CreateProductResponse;
 import com.fastcampus.web_ecommerce.response.product.GetProductResponse;
 import com.fastcampus.web_ecommerce.response.product.UpdateProductResponse;
+import com.fastcampus.web_ecommerce.service.CacheService;
 import com.fastcampus.web_ecommerce.service.ProductService;
+import com.fastcampus.web_ecommerce.service.RateLimitingService;
+import com.fastcampus.web_ecommerce.util.ValidateRoleUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +41,12 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
     private final ProductCategoryRepository productCategoryRepository;
+
+    private final String PRODUCT_CACHE_KEY = "products:";
+
+    private final CacheService cacheService;
+
+    private final RateLimitingService rateLimitingService;
 
     @Override
     public List<GetProductResponse> findAll() {
@@ -47,16 +61,23 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Page<GetProductResponse> findByPage(Pageable pageable) {
-        return productRepository.findAll(pageable)
-                .map(product -> {
-                    List<GetCategoryResponse> categoryResponses =
-                            getProductCategoryByProductId(product.getProductId());
-                    return GetProductResponse.fromProductAndCategorys(product, categoryResponses);
-                });
+        return rateLimitingService.excuteWithRateLimit("product_listing",
+                () -> productRepository.findAll(pageable)
+                        .map(product -> {
+                            List<GetCategoryResponse> categoryResponses =
+                                    getProductCategoryByProductId(product.getProductId());
+                            return GetProductResponse.fromProductAndCategorys(product, categoryResponses);
+                        }));
     }
 
     @Override
     public GetProductResponse findById(Long productId) {
+
+        String cacheKey = PRODUCT_CACHE_KEY + productId;
+        Optional<GetProductResponse> cacheProduct = cacheService.get(cacheKey, GetProductResponse.class);
+        if (cacheProduct.isPresent()) {
+            return cacheProduct.get();
+        }
 
         Product existingProduct = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Product not found with id: " + productId));
@@ -64,7 +85,10 @@ public class ProductServiceImpl implements ProductService {
         List<GetCategoryResponse> categoryResponses =
                 getProductCategoryByProductId(productId);
 
-        return GetProductResponse.fromProductAndCategorys(existingProduct, categoryResponses);
+        GetProductResponse getProductResponse =
+                GetProductResponse.fromProductAndCategorys(existingProduct, categoryResponses);
+        cacheService.put(cacheKey, getProductResponse);
+        return getProductResponse;
 
     }
 
@@ -80,7 +104,10 @@ public class ProductServiceImpl implements ProductService {
         List<ProductCategory> productCategories = getProductCategories(categories, createdProduct.getProductId());
         productCategoryRepository.saveAll(productCategories);
 
-        return ProductMapper.INSTANCE.mapToCreateProductResponse(createdProduct);
+        String cacheKey = PRODUCT_CACHE_KEY + createdProduct.getProductId();
+        CreateProductResponse createProductResponse = ProductMapper.INSTANCE.mapToCreateProductResponse(createdProduct);
+        cacheService.put(cacheKey, createProductResponse);
+        return createProductResponse;
 
     }
 

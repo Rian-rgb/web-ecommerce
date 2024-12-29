@@ -3,6 +3,7 @@ package com.fastcampus.web_ecommerce.response.product;
 import com.fastcampus.web_ecommerce.entity.Category;
 import com.fastcampus.web_ecommerce.entity.Product;
 import com.fastcampus.web_ecommerce.response.catogory.GetCategoryResponse;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import jakarta.persistence.Column;
@@ -29,8 +30,13 @@ public class GetProductResponse {
     private BigDecimal price;
     private Integer stockQuantity;
     private BigDecimal weight;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime updatedAt;
+
     private List<GetCategoryResponse> categorys;
 
     public static GetProductResponse fromProductAndCategorys(Product product, List<GetCategoryResponse> categorys) {

@@ -1,12 +1,13 @@
 package com.fastcampus.web_ecommerce.controller;
 
-import com.fastcampus.web_ecommerce.request.CreateProductRequest;
-import com.fastcampus.web_ecommerce.request.UpdateProductRequest;
+import com.fastcampus.web_ecommerce.request.product.CreateProductRequest;
+import com.fastcampus.web_ecommerce.request.product.UpdateProductRequest;
 import com.fastcampus.web_ecommerce.response.product.PaginationGetProductResponse;
 import com.fastcampus.web_ecommerce.response.product.CreateProductResponse;
 import com.fastcampus.web_ecommerce.response.product.GetProductResponse;
 import com.fastcampus.web_ecommerce.response.product.UpdateProductResponse;
 import com.fastcampus.web_ecommerce.service.ProductService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,6 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("products")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer")
 public class ProductController {
 
     private final ProductService productService;
